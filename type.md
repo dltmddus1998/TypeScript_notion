@@ -1,3 +1,5 @@
+# 2. 기본 타입 마스터 하기
+
 ## 기본 타입 정리 - JavaScript
 
 ---
@@ -478,7 +480,7 @@ const dayOfToday = DAYS_ENUM.MONDAY; // 0 할당
 
 ```tsx
 enum Days {
-        Monday,
+        Monday = 1,
         Tuesday,
         WednesDay,
         Thursday,
@@ -486,7 +488,125 @@ enum Days {
         Saturday,
         Sunday
     }
-    // console.log(Days.Saturday);
-    const day = Days.Saturday;
-    console.log(day); // 5
+// console.log(Days.Saturday);
+let day: Days = Days.Saturday;
+day = Days.Tuesday;
+day = 10; // 💩 no error
+console.log(day); // 5
 ```
+
+<aside>
+💡 **따로 설정하지 않으면 0부터 시작한다. (따로 설정 가능)
+문자열로 설정할 경우 수동적으로 하나씩 할당해줘야 한다.**
+
+</aside>
+
+<aside>
+💡 **BUT, 타입스크립트에서 Enum 사용은 지양한다.
+→ enum으로 타입이 지정된 변수에 다른 어떤 숫자도 할당할 수 있다는 것이 문제점이다.
+예를 들어, 이미 `Days.Tuesday(2)`가 할당된 `day`라는 변수에 10이라는 숫자를 재할당해도 아무런 에러가 발생하지 않는 것이다. 컴파일 에러도 일어나지 않는다. 
+대안책으로 TypeScript에서는 아래와 같이 Union Type을 활용할 수 있다.**
+
+</aside>
+
+ 
+
+```tsx
+type DaysOfWeek = 'Monday' | 'Tuesday' | 'Wednesday';
+    let dayOfweek: DaysOfWeek = 'Tuesday';
+    dayOfweek = 'Monday';
+```
+
+<aside>
+💡 Union Type으로 표현하면 이처럼 이미 ‘Tuesday’를 할당한 dayOfweek라는 변수에 재할당할 때 정해진 타입 중에서만 선택해서 사용할 수 가 있다.
+
+</aside>
+
+> **이처럼 enum은 충분히 union type으로 대체할 수 있으므로 enum을 굳이 사용하지 않고 union type을 이용해서 충분히 필요한 것들을 타입을 보장하면서 사용할 수 있다.**
+> 
+
+> **<예외>
+enum을 사용할 수 밖에 없는 경우는 딱 하나 있다.
+다른 모바일 클라이언트 (Android, IOS)는 Kotlin이나 Swift 같은 언어를 사용하므로 사용자의 데이터를 JSON으로 묶어서 다시 다른 클라이언트에게 보내야할 때 모바일 클라이언트에서 사용하는 Native Programming Language에서는 Union Type을 표현할 수 있는 방법이 없으므로 서로 이해할 수 있는 enum타입을 쓴다.**
+> 
+
+## 타입 추론이란?
+
+---
+
+### 타입 추론 (Type Inference)
+
+> 타입이 뻔한 경우에는 타입을 생략하고 작성해도 된다. (Type Inference)
+Parameter은 어떤 값이든 받을 수 있다. → 따라서 인자는 어떤 타입의 데이터를 받을건지 확실히 명시해줘야 한다.
+> 
+
+<aside>
+💡 **타입 추론 좋은걸까...?
+
+No!!!!
+물론 간단하게 작성한 코드에서는 타입 추론이 되지만 보통 프로젝트를 진행할 때는 코드가 복잡하기 때문에 타입을 정확하게 명시해주는 것이 좋다.
+다만, 원시 타입 같은 경우에는 뻔하기 때문에, 이런 경우는 생략이 가능하다. 그러나 함수 같은 경우에는 코드가 안에 들어있기 때문에 명시해줘야 한다. 
+따로 리턴되는 타입이 정해져 있는 경우 타입을 명시해주는 습관을 들이는 것이 중요하다. 
+예외로,void 타입인 경우 생략이 가능하다.**
+
+</aside>
+
+<aside>
+💡 **타입 추론 같은 경우 팀 프로젝트 진행시 정확하게 스타일 가이드를 확정해서 ‘우리는 이런식으로 타입을 명시해야 하고 이런 경우에는 생략이 가능하다’는 부분을 명확하게 정한 후, 가독성을 생각해서 일관성있게 코딩하는게 중요하다.**
+
+</aside>
+
+## Type Assertion
+
+---
+
+> Type Assertion은 가급적 피하는 것이 좋지만 불가피하게 사용해야하는 경우가 있다.
+100퍼센트 타입을 장담할 수 있을 때만 사용해야 한다.
+
+코딩시에는 문제가 없는데 실행했을 때 문제가 생길 확률이 높다.
+> 
+
+```tsx
+// Type Assertion
+function jsStrFunc(): any {
+    return 2;
+}
+//1. 
+const result = jsStrFunc();
+// result라는 변수가 string 타입인걸 확신한다 -> type assertion 사용 가능 
+console.log((result as string).length);
+
+//2.
+const wrong: any = 5;
+console.log((wrong as Array<number>).push(1)); // 💩
+
+//3.
+function findNumbers(): number[] | undefined {
+    return undefined;
+}
+const numbers = findNumbers(); 
+numbers?.push(2); // 이게 배열일거라 확신한다면 ?추가 -> 옵션이 아니라 절대적으로 값이 있다고 확신할 때 쓰는 것.
+
+//4.
+const button = document.querySelector('class')!; // 무조건 Null이 아니라 값이 있을거라고 확신할 때 ! 추가
+if (button) {
+    button.nodeValue;
+}
+```
+
+<aside>
+💡 **result가 string타입인게 확실할 때 다음과 같이 as string이라는 문구를 통해 length라는 문자열에 해당하는 메서드를 사용할 수 있다.
+
+두번째 예제에서 `wrong`이 5라는 숫자가 할당됐는데도 `Array<number>`, 즉 배열로 설정 후 `push`라는 배열 메서드를 쓰는 경우 코드 자체에는 에러가 없지만 실행시 에러가 나올 수 밖에 없는 것이다.
+
+세번째 예제에서 `findNumbers()`라는 함수가 `number[]` 타입으로 리턴할 것이 확실하다면 `?`를 추가하면 된다. (옵션이 아니라 절대적인 의미이다.)
+
+네번째 예제의 경우 돔을 이용해서 코딩할 때 `class`가 `null`일 수도 있지만 코딩 작성자가 `null`이 아니라 확신할 경우 `!`을 추가하면 된다.**
+
+</aside>
+
+<aside>
+💡 **위 네가지 경우가 Type Assertion을 사용하는 경우이다. 
+코딩시 100프로 장담하는 경우가 아닌 이상 사용을 지양해야 한다.**
+
+</aside>
