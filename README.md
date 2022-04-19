@@ -10,3 +10,5 @@
 [+) 기본 타입 관련 연습문제풀이_notion](https://vaulted-occupation-087.notion.site/3-853ccb0353a547948ccef301772fd173)
 
 [✍️ 3. 객체지향 프로그래밍 개념](https://github.com/dltmddus1998/TypeScript_notion/blob/main/oop_concept.md)
+
+[+) 객체지향 프로그래밍 Full_notion](https://vaulted-occupation-087.notion.site/4-826b23b830a340df92f66d993f53dd75)
