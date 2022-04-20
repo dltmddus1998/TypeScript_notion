@@ -778,3 +778,407 @@ grinding beans for 1
 heating up...🔥
 Pulling 1 shots...☕️
 ```
+
+
+### 👿 상속의 문제점
+
+> **✔︎ 어떤 부모 클래스의 행동을 수정하면 해당 사항때문에 이를 상속하는 모든 자식 클래스에 영향을 미칠 수 있다.
+✔︎ 새로운 기능 도입시 어떻게 상속의 구조를 지어야 할지 복잡하다.
+✔︎ 타입스크립트에서는 한 가지 이상의 부모클래스를 상속할 수 없다.
+→ Classes can only extend a single class**
+> 
+
+<aside>
+💡 **Favor Composition over inheritance 
+: 상속보단 구성을 더 선호하라**
+
+</aside>
+
+⭐️ 상속만을 이용해서 깊이있게 상속을 해버리면 관계가 복잡해질 수 있으므로 불필요한 상속 대신에 Composition을 이용해보자.
+
+<aside>
+💡 **중복되는 부분은 외부에서 주입 받아서 가져와보자.
+→ Dependency Injection**
+
+</aside>
+
+<aside>
+💡 **`CaffeLatteMaker` 클래스의 `steamMilk()` 부분을 지우고 해당 부분을 다음과 같이 수정해준다.
+`constructor`부분과 `makeCoffee()`의 return 부분에 변화가 생긴다.**
+
+</aside>
+
+```tsx
+// 싸구려 우유 거품기
+class CheapMilkSteamer {
+    private steamMilk(): void {
+        console.log('Steaming some milk...🥛');
+    }
+    makeMilk(cup: CoffeeCup): CoffeeCup {
+        this.steamMilk();
+        return {
+            ...cup,
+            hasMilk: true,
+        }
+    }
+}
+
+class CaffeLatteMachine extends CoffeeMachine {
+    constructor(
+        beans: number, 
+        public readonly serialNumber: string, 
+        private milkFother: CheapMilkSteamer
+        ) {
+        super(beans);
+    }
+    makeCoffee(shots: number): CoffeeCup {
+        const coffee = super.makeCoffee(shots);
+        return this.milkFother.makeMilk(coffee);
+    }
+}
+```
+
+<aside>
+💡 **`SweetCoffeeMaker`도 왼쪽과 같이 수정해준다.**
+
+</aside>
+
+```tsx
+// 설탕 제조기
+class AutomaticSugarMixer {
+    private getSugar() {
+        console.log('Getting some sugar from jar 🍭');
+        return true;
+    }
+
+    addSugar(cup: CoffeeCup): CoffeeCup {
+        const sugar = this.getSugar();
+        return {
+            ...cup,
+            hasSugar: sugar,
+        }
+    }
+}
+
+class SweetCoffeeMaker extends CoffeeMachine {
+    constructor(private beans: number, private sugar: AutomaticSugarMixer) {
+        super(beans);
+    };
+    makeCoffee(shots: number): CoffeeCup {
+        const coffee = super.makeCoffee(shots);
+        return this.sugar.addSugar(coffee);
+    }
+}
+```
+
+<aside>
+💡 **위 방식이 바로, 각각의 기능별로 클래스를 따로 만들어, 필요한 곳에서 가져다 쓰는 Composition방식이다.**
+
+</aside>
+
+🖇 **이 방식을 이용해서 SweetCaffeLatteMachine을 만들어보자!** 
+
+```tsx
+class SweetCaffeLatteMachine extends CoffeeMachine {
+        constructor(
+            private beans: number, 
+            private milk: CheapMilkSteamer, 
+            private sugar: AutomaticSugarMixer
+            ){
+                super(beans);
+        }
+        makeCoffee(shots: number): CoffeeCup {
+            const coffee = super.makeCoffee(shots);
+            const sugarAdded = this.sugar.addSugar(coffee);
+            return this.milk.makeMilk(sugarAdded);
+```
+
+> ✔︎ **이와 같이 Composition을 이용해서 필요한 기능을 외부로부터 받아와 재사용할 수 있다. 
+코드의 재사용성을 높여주는 것이다.
+
+✔︎ 단점
+: 위 클래스들은 `CheapMilkSteamer`와 `AutomaticSugarMixer`와 굉장히 타이트하게 커플링되어져 있다.
+⭐️ 클래스 간에 연관되어 있는 것은 좋은 코드가 아니다!**
+> 
+
+✍️ *여기서 말한 단점을 개선할만한 테크닉에 대해 아래에서 바로 언급하겠다.*
+
+### 💪🏼 강력한 Interface
+
+<aside>
+💡 **클래스 간 상호작용이 발생하는 경우, 클래스 자신을 노출하는게 아니라 interface를 통해 서로간의 상호작용을 해야 한다. (decoupling의 원칙)**
+
+</aside>
+
+<aside>
+💡 **아래 코드에서 위에서 만든 모든 클래스는 지워주고 (기능 구현에 필요한 최소한의 인터페이스와 클래스 제외) 이를 `CoffeeMachine` 클래스를 다음과 같이 수정함으로써 코드의 재사용성을 높여준다.
+인터페이스를 통해 상호작용하기 위해 `MilkFrother`, `SugarProvider`라는 인터페이스를 이용했다.**
+
+</aside>
+
+```tsx
+{
+    type CoffeeCup = {
+        shots: number;
+        hasMilk?: boolean;
+        hasSugar?: boolean;
+    }
+
+    interface CoffeeMaker {
+        makeCoffee(shots: number): CoffeeCup;
+    }
+
+    class CoffeeMachine implements CoffeeMaker {
+        private static BEANS_GRAMM_PER_SHOT: number = 7;
+        private coffeeBeans: number = 0;
+
+        constructor(
+            coffeeBenas: number, 
+            private milk: MilkFrother, 
+            private sugar: SugarProvider
+        ) 
+        {
+            this.coffeeBeans = coffeeBenas; // 해당 클래스 안에 있는 coffeeBeans를 전달된 coffeeBeans만큼 할당
+        }
+
+        fillCoffeeBeans(beans: number) {
+            if (beans < 0) {
+                throw new Error('values for beans should be greater than 0');
+            }
+            this.coffeeBeans += beans;
+        }
+
+        clean() {
+            console.log('cleaning the machine...🧼');
+        }
+
+        private grindBeans(shots: number) {
+            console.log(`grinding beans for ${shots}`);
+            if (this.coffeeBeans < shots * CoffeeMachine.BEANS_GRAMM_PER_SHOT) {
+                throw new Error('Not enough coffee beans!!');
+            }
+            this.coffeeBeans -= shots * CoffeeMachine.BEANS_GRAMM_PER_SHOT;
+        }
+
+        private preheat(): void {
+            console.log('heating up...🔥');
+            
+        }
+
+        private extract(shots: number): CoffeeCup {
+            console.log(`Pulling ${shots} shots...☕️`);
+            return {
+                shots,
+                hasMilk: false,
+            }
+            
+        }
+
+        makeCoffee(shots: number): CoffeeCup {
+            this.grindBeans(shots);
+            this.preheat();
+            const coffee = this.extract(shots);
+            const sugarAdded = this.sugar.addSugar(coffee);
+            return this.milk.makeMilk(sugarAdded);
+        }
+    }
+
+    interface MilkFrother {
+        makeMilk(cup: CoffeeCup): CoffeeCup;
+    }
+
+    interface SugarProvider {
+        addSugar(cup: CoffeeCup): CoffeeCup;
+    }
+
+    // 싸구려 우유 거품기
+    class CheapMilkSteamer implements MilkFrother {
+        private steamMilk(): void {
+            console.log('Steaming some milk...🥛');
+        }
+        makeMilk(cup: CoffeeCup): CoffeeCup {
+            this.steamMilk();
+            return {
+                ...cup,
+                hasMilk: true,
+            }
+        }
+    }
+
+    class FancyMilkSteamer implements MilkFrother {
+        private steamMilk(): void {
+            console.log('Fancy Steaming some milk...🥛');
+        }
+        makeMilk(cup: CoffeeCup): CoffeeCup {
+            this.steamMilk();
+            return {
+                ...cup,
+                hasMilk: true,
+            }
+        }
+    }
+
+    class ColdMilkSteamer implements MilkFrother {
+        private steamMilk(): void {
+            console.log('Fancy Steaming some milk...🥛');
+        }
+        makeMilk(cup: CoffeeCup): CoffeeCup {
+            this.steamMilk();
+            return {
+                ...cup,
+                hasMilk: true,
+            }
+        }
+    }
+
+    // 우유를 만들지 않음
+    class NoMilk implements MilkFrother {
+        makeMilk(cup: CoffeeCup): CoffeeCup {
+            return cup;
+        }
+    }
+
+    // 설탕 제조기
+    class CandySugarMixer implements SugarProvider {
+        private getSugar() {
+            console.log('Getting some sugar from jar 🍭');
+            return true;
+        }
+
+        addSugar(cup: CoffeeCup): CoffeeCup {
+            const sugar = this.getSugar();
+            return {
+                ...cup,
+                hasSugar: sugar,
+            }
+        }
+    }
+
+    class SugarMixer implements SugarProvider {
+        private getSugar() {
+            console.log('Getting some sugar from jar 🍭');
+            return true;
+        }
+
+        addSugar(cup: CoffeeCup): CoffeeCup {
+            const sugar = this.getSugar();
+            return {
+                ...cup,
+                hasSugar: sugar,
+            }
+        }
+    }
+
+    class NoSugar implements SugarProvider {
+        addSugar(cup: CoffeeCup): CoffeeCup {
+            return cup;
+        }
+    }
+
+    
+
+    // Milk
+    const cheapMilkMaker = new CheapMilkSteamer();
+    const fancyMilkMaker = new FancyMilkSteamer();
+    const coldMilkMaker = new ColdMilkSteamer();
+    const noMilk = new NoMilk();
+
+    // Sugar
+    const candySugar = new CandySugarMixer();
+    const sugar = new SugarMixer();
+    const noSugar = new NoSugar();
+
+    // 
+    const sweetCandyMahcine = new CoffeeMachine(12, noMilk, candySugar);
+    const sweetMahcine = new CoffeeMachine(12, noMilk, sugar);
+
+    const latteMachine = new CoffeeMachine(12, cheapMilkMaker, noSugar);
+    const coldLatteMachine = new CoffeeMachine(12, coldMilkMaker, noSugar);
+    const sweetLatteMachine = new CoffeeMachine(12, cheapMilkMaker, candySugar);
+}
+```
+
+> **상속이 무조건 나쁘고, composition만 이용해야하는 건 아니지만, 코드가 너무 수직적인 관계 (깊은 관계)라면 composition을 이용해서 좀 더 필요한 기능들을 조립해서 확장이 가능하고 재사용성이 높고, 유지보수가 쉬우며 더 높은 퀄리티의 코드를 만들기 위해 고민하는 과정이 중요하다.**
+> 
+
+<aside>
+💡 **기능을 구현하는 게 우선이지, 확장성만 고려해서 코드를 복잡하게 짤 필요는 없다.**
+
+</aside>
+
+### ✏️ Abstract 클래스
+
+> **✔︎ abstract 클래스 자체는 object 생성이 불가능하다. (추상적인 클래스)
+→ 공통적인 기능 구현 가능
+
+✔︎ 구현하는 클래스마다 달라져야하는 부분이 있다면 해당 부분만 abstract 메소드로 정의한다.
+→ 함수 이름이 무엇인지, 인자를 무엇을 받아서 무엇을 리턴하는지만 정의할 수 있다.
+→ `protected abstract extract()`**
+> 
+
+```tsx
+// abstract 키워드를 붙이면 CoffeeMachine 자체로는 Object 생성 불가
+abstract class CoffeeMachine implements CoffeeMaker {
+    private static BEANS_GRAMM_PER_SHOT: number = 7;
+    private coffeeBeans: number = 0;
+
+    constructor(coffeeBenas: number) {
+        this.coffeeBeans = coffeeBenas; // 해당 클래스 안에 있는 coffeeBeans를 전달된 coffeeBeans만큼 할당
+    }
+
+    fillCoffeeBeans(beans: number) {
+        if (beans < 0) {
+            throw new Error('values for beans should be greater than 0');
+        }
+        this.coffeeBeans += beans;
+    }
+
+    clean() {
+        console.log('cleaning the machine...🧼');
+    }
+
+    private grindBeans(shots: number) {
+        console.log(`grinding beans for ${shots}`);
+        if (this.coffeeBeans < shots * CoffeeMachine.BEANS_GRAMM_PER_SHOT) {
+            throw new Error('Not enough coffee beans!!');
+        }
+        this.coffeeBeans -= shots * CoffeeMachine.BEANS_GRAMM_PER_SHOT;
+    }
+
+    private preheat(): void {
+        console.log('heating up...🔥');
+        
+    }
+
+    // abstract 메소드는 구현사항을 쓰면 안됨.
+    protected abstract extract(shots: number): CoffeeCup ;
+
+    makeCoffee(shots: number): CoffeeCup {
+        this.grindBeans(shots);
+        this.preheat();
+        return this.extract(shots);
+    }
+}
+
+class CaffeLatteMachine extends CoffeeMachine {
+    constructor(beans: number, public readonly serialNumber: string) {
+        super(beans);
+    }
+    private steamMilk(): void {
+        console.log('Steaming some milk...🥛');
+    }
+		// abstract method 사용
+    protected extract(shots: number): CoffeeCup {
+        this.steamMilk();
+        return {
+            shots,
+            hasMilk: true,
+        }
+    }
+}
+```
+
+<aside>
+💡 **abstract 클래스를 이용하면 공통적인 기능들을 수행하고 달라져야 하는 부분만 상속하는 클래스에게 강조할 수 있는 효과가 있다.**
+
+</aside>
