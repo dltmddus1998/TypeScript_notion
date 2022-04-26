@@ -1,14 +1,18 @@
 # TypeScript_notion
 타입스크립트 드림코딩 강의 기반 노션 정리
 
-[✍️ 1. 기본 타입 마스터하기](https://github.com/dltmddus1998/TypeScript_notion/blob/main/type.md)
+[✍️ 1. 타입스크립트란?](https://github.com/dltmddus1998/TypeScript_notion/blob/main/Definition_TS.md)
+
+[+) 타입스크립트 기본 정의_notion](https://vaulted-occupation-087.notion.site/1-0852b6f7634748e4a562f7512c08f564)
+
+[✍️ 2. 기본 타입 마스터하기](https://github.com/dltmddus1998/TypeScript_notion/blob/main/type.md)
 
 [+) 기본 타입_notion](https://vaulted-occupation-087.notion.site/2-36815906dcdf49eeb713707e007eec93)
 
-[✍️ 2. 기본 타입 관련 연습문제풀이](https://github.com/dltmddus1998/TypeScript_notion/blob/main/type_practice.md)
+[✍️ 3. 기본 타입 관련 연습문제풀이](https://github.com/dltmddus1998/TypeScript_notion/blob/main/type_practice.md)
 
 [+) 기본 타입 관련 연습문제풀이_notion](https://vaulted-occupation-087.notion.site/3-853ccb0353a547948ccef301772fd173)
 
-[✍️ 3. 객체지향 프로그래밍 개념](https://github.com/dltmddus1998/TypeScript_notion/blob/main/oop_concept.md)
+[✍️ 4. 객체지향 프로그래밍 개념](https://github.com/dltmddus1998/TypeScript_notion/blob/main/oop_concept.md)
 
 [+) 객체지향 프로그래밍 Full_notion](https://vaulted-occupation-087.notion.site/4-826b23b830a340df92f66d993f53dd75)
