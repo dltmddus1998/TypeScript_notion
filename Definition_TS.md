@@ -3,7 +3,7 @@
 
 </aside>
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/254c8267-c75c-4972-bb09-13bd014c7492/Untitled.png)
+<img src="https://user-images.githubusercontent.com/73332608/165233977-d437fa97-2fdf-4e8a-992c-ec2af6ba59b0.png" width="200" height="180">
 
 <aside>
 💡 이렇게 번거롭게 변환할 필요 없이 바로 실행할 수 있게 도와주는 툴이 있다.
@@ -27,9 +27,9 @@
 > **TypeScipt는 Client side와 Server side 모두 JavaScript가 존재하는 어떤 곳에서도 사용이 가능하다 
 → TypeScript를 그대로 쓸 수 있는 것이 아니라 TypeScript로 transcompiling해서 JavaScript로 변환해서 쓰는 것이다. 
 +) compiler: TS 툴 자체에서 제공되는 컴파일러나 BABEL 사용**
-> 
 
-![TypeScript & JavaScript 집합도](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/a7cb3457-9a97-4a97-b183-07b92a0ea6e3/Untitled.png)
+
+<img src="https://user-images.githubusercontent.com/73332608/165234555-17e45fce-087c-43c9-b57f-f1e5eec7b517.png" width="450" height="180">
 
 TypeScript & JavaScript 집합도
 
@@ -80,6 +80,8 @@ TypeScript & JavaScript 집합도
 **Dynamically Typed (동적 결정)** - `python`, `ruby`, `Lua`, `php`, `JavaScript`
 
 **Statically Typed (정적 결정)** - `TypeScript`, `scala`, `go`, `Java`, `Kotlin`, `Swift`, `C`, `C++`
+
+
 
 ### 컴파일러 (Compiler)
 
