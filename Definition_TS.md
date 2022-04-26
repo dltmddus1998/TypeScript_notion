@@ -28,7 +28,6 @@
 → TypeScript를 그대로 쓸 수 있는 것이 아니라 TypeScript로 transcompiling해서 JavaScript로 변환해서 쓰는 것이다. 
 +) compiler: TS 툴 자체에서 제공되는 컴파일러나 BABEL 사용**
 
-
 <img src="https://user-images.githubusercontent.com/73332608/165234555-17e45fce-087c-43c9-b57f-f1e5eec7b517.png" width="450" height="180">
 
 TypeScript & JavaScript 집합도
