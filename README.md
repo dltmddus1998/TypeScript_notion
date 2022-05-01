@@ -16,3 +16,7 @@
 [✍️ 4. 객체지향 프로그래밍 개념](https://github.com/dltmddus1998/TypeScript_notion/blob/main/oop_concept.md)
 
 [+) 객체지향 프로그래밍 Full_notion](https://vaulted-occupation-087.notion.site/4-826b23b830a340df92f66d993f53dd75)
+
+[✍️ 5. 타입스크립트로 스택 구현해보기](https://github.com/dltmddus1998/TypeScript_notion/blob/main/stack_tscode.md)
+
+[+) 타입스크립트로 스택 구현해보기_notion](https://vaulted-occupation-087.notion.site/5-f39849c14afd4f7097ce17d0e6ebca8c)
