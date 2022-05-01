@@ -96,10 +96,13 @@ class level은 class와 연결되므로 오브젝트 생성할 때마다 나타�
 
 </aside>
 
+<br>
+
 <aside>
-💡 **클래스는 관련된 속성과 함수들을 묶어서 어떤 모양의 데이터가 될거라는 걸 정의하는 것이고, 이 클래스에 실제 데이터를 넣어서 오브젝트를 만들 수 있다.**
+💡 클래스는 관련된 속성과 함수들을 묶어서 어떤 모양의 데이터가 될거라는 걸 정의하는 것이고, 이 클래스에 실제 데이터를 넣어서 오브젝트를 만들 수 있다.
 
 </aside>
+<br>
 
 ### 만약에 constructor을 사용하고 싶지 않다?
 
@@ -145,11 +148,11 @@ class level은 class와 연결되므로 오브젝트 생성할 때마다 나타�
 ```
 
 <aside>
-💡 **클래스 내부의 어떠한 속성값도 필요로 하지 않으므로 앞에 static을 붙여주면 된다.
+💡 클래스 내부의 어떠한 속성값도 필요로 하지 않으므로 앞에 static을 붙여주면 된다.
 이를 통해, 외부에서도 클래스 만들지않고 `CoffeeMaker` 클래스에 있는 `makeMachine` 함수를 통해 간단하게 커피기계를 만들 수 있다.
-만약 static을 붙이지 않는다면, `CoffeeMaker.makeMachine()`은 사용불가하고, 위에 만들어진 오브젝트를 통해 (`maker.makeMachine()`) 함수를 호출할 수 있다.**
-
+만약 static을 붙이지 않는다면, `CoffeeMaker.makeMachine()`은 사용불가하고, 위에 만들어진 오브젝트를 통해 (`maker.makeMachine()`) 함수를 호출할 수 있다.
 </aside>
+<br>
 
 ### 2️⃣ 캡슐화 (encapsulation) 적용하기
 
@@ -157,12 +160,12 @@ class level은 class와 연결되므로 오브젝트 생성할 때마다 나타�
 > 
 
 <aside>
-💡 **위 코드의 문제점!
+💡 위 코드의 문제점!
 `maker.coffeBeans = -4;` 이런식으로 비정상적인 오브젝트의 변수 할당에 대한 제약사항이 없으므로 외부에서 오브젝트 상태를 유효하지 않은 상태로 만들 수 있다.
-해당 문제를 캡슐화를 이용하여 외부에서 보이면 안되는 부분을 가릴 것이다.**
+해당 문제를 캡슐화를 이용하여 외부에서 보이면 안되는 부분을 가릴 것이다.
 
 </aside>
-
+<br>
 ```tsx
 {
     type CoffeeCup = {
@@ -1102,18 +1105,22 @@ class SweetCaffeLatteMachine extends CoffeeMachine {
 > 
 
 <aside>
-💡 **기능을 구현하는 게 우선이지, 확장성만 고려해서 코드를 복잡하게 짤 필요는 없다.**
+💡 기능을 구현하는 게 우선이지, 확장성만 고려해서 코드를 복잡하게 짤 필요는 없다.
 
 </aside>
+<br>
 
 ### ✏️ Abstract 클래스
 
-> **✔︎ abstract 클래스 자체는 object 생성이 불가능하다. (추상적인 클래스)
+✔︎ abstract 클래스 자체는 object 생성이 불가능하다. (추상적인 클래스)
+
 → 공통적인 기능 구현 가능
 
 ✔︎ 구현하는 클래스마다 달라져야하는 부분이 있다면 해당 부분만 abstract 메소드로 정의한다.
+
 → 함수 이름이 무엇인지, 인자를 무엇을 받아서 무엇을 리턴하는지만 정의할 수 있다.
-→ `protected abstract extract()`**
+
+→ `protected abstract extract()`
 > 
 
 ```tsx
@@ -1179,6 +1186,6 @@ class CaffeLatteMachine extends CoffeeMachine {
 ```
 
 <aside>
-💡 **abstract 클래스를 이용하면 공통적인 기능들을 수행하고 달라져야 하는 부분만 상속하는 클래스에게 강조할 수 있는 효과가 있다.**
+💡 abstract 클래스를 이용하면 공통적인 기능들을 수행하고 달라져야 하는 부분만 상속하는 클래스에게 강조할 수 있는 효과가 있다.
 
 </aside>
