@@ -77,7 +77,7 @@ either.right(); // 5
 const best = new SimpleEither({ name: 'seungyeon' }, 'hello');
 ```
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/ac05afbb-ccf8-40b0-a45d-9d504ed9a7a9/Untitled.png)
+<img src="https://user-images.githubusercontent.com/73332608/166262715-e79f17e3-72aa-429a-abe6-72004f8885e9.png" width="800" height="300">
 
 <aside>
 💡 **best 변수에 마우스를 올리면 다음과 같이 제네릭의 특성에 의해 유동적으로 타입을 결정할 수 있음을 알 수 있다.**
@@ -136,9 +136,8 @@ const bobAfterPay = pay(bob);
 
 > **✔︎ payBad 함수는 Employee라는 세부적인 타입을 인자로 받은 경우인데, 이런 추상적인 타입으로 다시 리턴하는 함수는 지양해야 한다.
 
-✔︎ pay 함수에서 `T extends Employee`라는 제네릭 표현을 통해 잘못된 함수를 수정했다.
-→ 여기서 `T extends Employee`는 *“Employee를 확장한 타입만 가능하다”*는 의미이다.**
-> 
+> **✔︎ pay 함수에서 `T extends Employee`라는 제네릭 표현을 통해 잘못된 함수를 수정했다.
+→ 여기서 `T extends Employee`는 *“Employee를 확장한 타입만 가능하다”*는 의미이다.** 
 
 ```tsx
 // 👀 추가 예제
