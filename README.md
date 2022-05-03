@@ -20,3 +20,9 @@
 [✍️ 5. 타입스크립트로 스택 구현해보기](https://github.com/dltmddus1998/TypeScript_notion/blob/main/stack_tscode.md)
 
 [+) 타입스크립트로 스택 구현해보기_notion](https://vaulted-occupation-087.notion.site/5-f39849c14afd4f7097ce17d0e6ebca8c)
+
+[✍️ 6. 제네릭이란?](https://github.com/dltmddus1998/TypeScript_notion/blob/main/generic.md)
+
+[+) 제네릭 개념 정리 및 예제_notion1](https://vaulted-occupation-087.notion.site/6-e1d8f7554c284a8f96663cd67ef6d142)
+
+[+) 제네릭 개념 정리 및 예제_notion2](https://vaulted-occupation-087.notion.site/7-f1a57ebc29e04049a332bfedd2e9b5bf)
