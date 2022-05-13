@@ -26,3 +26,7 @@
 [+) 제네릭 개념 정리 및 예제_notion1](https://vaulted-occupation-087.notion.site/6-e1d8f7554c284a8f96663cd67ef6d142)
 
 [+) 제네릭 개념 정리 및 예제_notion2](https://vaulted-occupation-087.notion.site/7-f1a57ebc29e04049a332bfedd2e9b5bf)
+
+[✍️ 7. 유틸리티 타입 활용](https://github.com/dltmddus1998/TypeScript_notion/blob/main/Utility_Type.md)
+
+[+) 유틸리티 타입 활용_notion](https://vaulted-occupation-087.notion.site/10-8c5ea3751ee94a9d9c75047c8344e25c)
