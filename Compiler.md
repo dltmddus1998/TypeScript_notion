@@ -42,5 +42,3 @@
 - sourceMap - 디버깅시 유용하게 사용
 
 [TSConfig Reference - Docs on every TSConfig option](https://www.typescriptlang.org/tsconfig)
-
-## How to Debug?
