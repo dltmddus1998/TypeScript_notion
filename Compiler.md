@@ -42,3 +42,16 @@
 - sourceMap - 디버깅시 유용하게 사용
 
 [TSConfig Reference - Docs on every TSConfig option](https://www.typescriptlang.org/tsconfig)
+
+<br />
+<br />
+
+## How to Debug?
+
+---
+
+✔︎ **`tsconfig.json`에서 `“sourceMap”: true` 설정**
+
+`.map` → 우리가 작성한 `.ts` 코드 & 컴파일된 `.js` 코드 연결시켜주는 모든 정보가 담긴 파일
+
+**이를 통해 크롬 브라우저에서 디버깅이 가능해진다.**
