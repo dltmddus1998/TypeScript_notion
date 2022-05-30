@@ -168,7 +168,7 @@ body {
 }
 ```
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/cf9420b8-8768-4bbe-a81b-00a2e7f2f4ab/Untitled.png)
+<img src="https://user-images.githubusercontent.com/73332608/171009184-4a20d3e3-2897-4864-93cc-2f54d8f1e5bd.png" width="350" height="400">
 
 ### 👀 Part 2. Component
 
@@ -295,4 +295,4 @@ class App {
 new App(document.querySelector('.document')! as HTMLElement)
 ```
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/f84e27db-8f1f-40c0-a328-cce2c6c04c8f/Untitled.png)
+<img src="https://user-images.githubusercontent.com/73332608/171009359-2331afe9-5855-45c1-982f-c506e3a02a7e.png" width="350" height="400">
