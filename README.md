@@ -30,3 +30,7 @@
 [✍️ 7. 유틸리티 타입 활용](https://github.com/dltmddus1998/TypeScript_notion/blob/main/Utility_Type.md)
 
 [+) 유틸리티 타입 활용_notion](https://vaulted-occupation-087.notion.site/10-8c5ea3751ee94a9d9c75047c8344e25c)
+
+[✍️ 8. MOTION Project 코드 해설](https://github.com/dltmddus1998/TypeScript_notion/blob/main/Motion_Project.md)
+
+[+) MOTION Project 코드 해설_notion](https://vaulted-occupation-087.notion.site/14-MOTION-2009f8f849b840d6a1ba9e70273ea28b)
