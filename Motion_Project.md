@@ -296,3 +296,140 @@ new App(document.querySelector('.document')! as HTMLElement)
 ```
 
 <img src="https://user-images.githubusercontent.com/73332608/171009359-2331afe9-5855-45c1-982f-c506e3a02a7e.png" width="350" height="400">
+
+<br>
+
+## 🏭 Component Refactoring
+
+---
+
+```tsx
+// component.ts
+export interface Component {
+    attachTo(parent: HTMLElement, position?: InsertPosition): void;
+}
+
+// Encapsulate the HTML element creation 
+export class BaseComponent<T extends HTMLElement> implements Component {
+    // 한 번 만들어진 요소는 변경 불가 (요소 안의 상태들은 변경 가능)
+    protected readonly element: T;
+    constructor(htmlString: string) {
+				// 1.
+        const template = document.createElement('template');
+        template.innerHTML = htmlString;
+        this.element = template.content.firstElementChild! as T;
+    }
+
+    attachTo(parent: HTMLElement, position: InsertPosition = 'afterbegin') {
+        parent.insertAdjacentElement(position, this.element);
+    }
+}
+```
+
+✔︎ **더 다양한 서브 클래스를 사용할 수 있도록 제네릭을 만들어 보자.**
+
+**BaseComponent**
+
+→ *“Encapsulate the HTML element creation”* **(HTML 요소 생성을 캡슐화한다.)**
+
+✔︎ 즉, `BaseComponent`에 어떤 것을 만들고 싶은지 string 타입의 HTML을 전달하면 알아서 `element`를 만들게 된다. 그리고 `attachTo`라는 `API`를 통해 `parent`에 만든 요소를 붙일 수 있다. 이렇게 `API`가 있다면 `BaseComponent`로 의사소통하는 것보다는 `Interface`를 활용하는 것이 낫다.
+**→ attachTo를 선언한 Component 인터페이스 생성 및 BaseComponent클래스에 상속.**
+
+1. `image.ts`에 전달할 부분을 `constructor`내부에 작성해준다. htmlString은 `image.ts`에서 `super`을 통해 전달받은 것을 `template.innerHTML`에 할당해준다.
+
+```tsx
+// image.ts
+import { BaseComponent } from './../../component.js';
+export class ImageComponent extends BaseComponent<HTMLElement> {
+    constructor(title: string, url: string) {
+        super(`<section class="image">
+                <div class="image__holder"><img src="" alt="" class="image__thumbnail"></div>
+                <p class="image__title"></p>
+            </section>`);
+
+        const imageElement = this.element.querySelector('.image__thumbnail')! as HTMLImageElement;
+        imageElement.src = url;
+        imageElement.alt = title;
+
+        const titleElement = this.element.querySelector('.image__title')! as HTMLParagraphElement;
+        titleElement.textContent = title;
+    }
+}
+```
+
+✔︎ BaseComponent를 import해 ImageComponent클래스에 상속했다.
+
+✔︎ super을 통해 htmlString을 전달해준다.
+
+```tsx
+// page.ts
+import { BaseComponent } from './../component.js';
+
+export class PageComponent extends BaseComponent<HTMLUListElement>{
+    constructor() {
+        super('<ul class="page">This is PageComponent!</ul>')
+    }
+}
+```
+
+✔︎ super을 통해 htmlString을 다음과 같이 보낸다. 원래의 방식과는 다르게 string타입으로 표현했다.
+
+**Component**
+
+- App - 어플리케이션 전체를 가지고 있는 제일 큰 컨테이너 클래스
+- PageComponent - 사용자가 추가하는 문서를 담을 수 있는 페이지 컨테이너 컴포넌트 클래스
+- ImageComponent - 사용자가 추가할 수 있는 문서중 하나의 타입, 이미지 노트
+
+**‼️ 리팩토링 하기전**
+
+서로 다른 역할을 가진 로직들을 각각 다른 클래스로 묶어줌 
+
+**→ 문제점: PageComponent & ImageComponent 코드 중복 (element, attachTo)** 
+
+**→ 해결책**
+
+**중복되는 속성과 행동들을 공통적인 클래스로 정의해둠. (`BaseComponent`)**
+
+**>> 상속을 통해 중복된 코드의 반복 없이 모든 속성과 행동 표현 가능.**
+
+**→ 코드의 재사용성 up**
+
+## Note, Todo Component
+
+---
+
+```tsx
+// note.ts
+import { BaseComponent } from './../../component.js';
+export class NoteComponent extends BaseComponent<HTMLElement> {
+    constructor(title: string, body: string) {
+        super(`<section class="note">
+                <h2 class="note__title"></h2>
+                <p class="note__body"></p>
+            </section>`);
+        const titleElement = this.element.querySelector('.note__title')! as HTMLElement;
+        titleElement.textContent = title;
+
+        const bodyElement = this.element.querySelector('.note__body')! as HTMLParagraphElement;
+        bodyElement.textContent = body;
+    }
+}
+```
+
+```tsx
+// todo.ts
+import { BaseComponent } from './../../component.js';
+export class TodoComponent extends BaseComponent<HTMLElement> {
+    constructor(title: string, todo: string) {
+        super(`<section class="todo">
+                <h2 class="todo__title"></h2>
+                <input type="checkbox" class="todo-checkbox">
+            </section>`);
+        const titleElement = this.element.querySelector('.todo__title')! as HTMLElement;
+        titleElement.textContent = title;
+
+        const todoElement = this.element.querySelector('.todo-checkbox')! as HTMLInputElement;
+        todoElement.insertAdjacentText('afterend', todo);
+    }
+}
+```
