@@ -56,115 +56,97 @@
 ### 👀 Part 1. UI
 
 ```css
-/* style.css */
 :root {
-  --bg-main-color: #00000080;
-  --bg-accent-color: #2d2d2d;
-  --accent-color: #f64435;
-  --text-accent-color: #ffe498;
-  --text-edit-bg-color: #575757;
-  --border-color: #3f3f3f;
-  --shadow-color: #202020;
-  --document-bg-color: #68686850;
-  --component-bg-gradient: radial-gradient(circle, #646464e6 0%, #363636e6 100%);
-  --smokywhite: #dddbd8;
-  --black: #000000;
-  --translucent-black: #00000099;
-}
-
-li {
-  list-style: none;
-  padding-left: 0;
-}
-
-p {
-  color: var(--smokywhite);
-}
-
-label {
-  color: var(--text-accent-color);
-}
-
-* {
-  outline: 0;
-  box-sizing: border-box;
+    --bg-main-color: #000000;
+    --bg-accent-color: #2d2d2d;
+    --accent-color: #EB5454;
+    --text-accent-color: #ffe498;
+    --text-edit-bg-color: #575757;
+    --border-color: #3f3f3f;
+    --shadow-color: #202020;
+    --document-bg-color: #68686850;
+    --component-bg-gradient: radial-gradient(circle, #646464e6 0%, #363636e6 100%);
+    --smokywhite: #dddbd8;
+    --black: #000000;
+    --translucent-black: #00000099;
 }
 
 body {
-  background: url('../assets/background.png') center/cover no-repeat;
-  font-family: Roboto, Oxygen, sans-serif;
-  display: flex;
-  justify-content: center;
-  height: 100vh;
-  overflow: hidden;
-  font-size: 1.25rem;
-  margin: 0;
+    background: url('../assets/background.png') center/cover no-repeat;
+    font-family: Roboto, Oxygen, sans-serif;
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+    font-size: 1.25rem;
+    margin: 0;
 }
 
 .app {
-  width: 100%;
-  max-width: 1000px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+    width: 100%;
+    max-width: 1000px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .banner {
-  background: var(--bg-main-color);
-  border-bottom: 1px solid var(--bg-accent-color);
-  text-align: center;
+    background: var(--bg-main-color);
+    border-bottom: 1px solid var(--bg-accent-color);
+    text-align: center;
 }
 
 .banner__title {
-  margin: 20px;
-  color: var(--accent-color);
+    margin: 20px;
+    color: var(--accent-color);
 }
 
 .control-panel {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .create-button {
-  margin: 0.1em 0.2em;
-  text-align: center;
-  user-select: none;
-  padding: 1em 3em;
-  text-transform: uppercase;
-  font-weight: 600;
-  font-size: 0.8rem;
-  color: white;
-  background-color: var(--accent-color);
-  border-color: var(--accent-color);
-  border-radius: 2px;
+    margin: 0.1em 0.2em;
+    text-align: center;
+    user-select: none;
+    padding: 1em 3em;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: white;
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    border-radius: 4px;
 }
 
 .document {
-  height: 100%;
-  overflow-y: auto;
-  background-color: var(--document-bg-color);
-  /* Firefox */
-  scrollbar-width: 6px;
-  scrollbar-color: var(--bg-accent-color);
-  scrollbar-face-color: var(--accent-color);
+    height: 100%;
+    overflow-y: auto;
+    background-color: var(--document-bg-color);
+    /* Firefox (scrollbar styling) */
+    scrollbar-width: 6px;
+    scrollbar-color: var(--bg-accent-color);
+    scrollbar-face-color: var(--accent-color);
 }
 
 .document::-webkit-scrollbar {
-  /* Safari and Chrome */
-  background-color: var(--bg-accent-color);
-  width: 6px;
+    /* safari and chrome */
+    background-color: var(--bg-accent-color);
+    width: 6px;
 }
 
 .document::-webkit-scrollbar-thumb {
-  /* Safari and Chrome */
-  background-color: var(--accent-color);
+    /* safari and chrome */
+    background-color: var(--accent-color);
 }
 
 .footer {
-  background: var(--bg-main-color);
-  border-top: 1px solid var(--border-color);
-  text-align: center;
+    background: var(--bg-main-color);
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+    color: white;
 }
 ```
 
@@ -519,6 +501,38 @@ export class VideoComponent extends BaseComponent<HTMLElement> {
 ✔︎ url에서 video ID만 따로 추출하는 함수 `convertToEmbeddedURL`을 선언한다.
 → 이 때, **정규 표현식**을 활용한다.
 → videoId가 존재할 경우 임베드된 video url을 반환할 수 있도록 한다.
+
+```jsx
+// app.ts
+import { VideoComponent } from './components/page/item/video.js';
+import { TodoComponent } from './components/page/item/todo.js';
+import { NoteComponent } from './components/page/item/note.js';
+import { ImageComponent } from './components/page/item/image.js';
+import { PageComponent } from './components/page/page.js';
+
+class App {
+    private readonly page: PageComponent;
+    constructor(appRoot: HTMLElement) {
+        this.page = new PageComponent();
+        this.page.attachTo(appRoot);
+
+        const image = new ImageComponent('Image Title', 'https://picsum.photos/600/300');
+        image.attachTo(appRoot, 'beforeend');
+
+        const video = new VideoComponent('Video Title', 'https://www.youtube.com/embed/yA4d5ZydVVQ');
+        video.attachTo(appRoot, 'beforeend');
+
+        const note = new NoteComponent('Note Title', 'Note Body');
+        note.attachTo(appRoot, 'beforeend');
+
+        const todo = new TodoComponent('Todo Title', 'Todo Item');
+        todo.attachTo(appRoot, 'beforeend');
+    }
+}
+
+// 동적으로 만드는게 아니라 개발시 정확히 정해진 경우 -> 무조건 null 아니고 HTMLElement 타입이라고 Type Assertion로 표시
+new App(document.querySelector('.document')! as HTMLElement)
+```
 
 ### ⚙️ 정규 표현식이란?
 
