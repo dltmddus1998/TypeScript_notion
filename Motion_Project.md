@@ -433,3 +433,95 @@ export class TodoComponent extends BaseComponent<HTMLElement> {
     }
 }
 ```
+
+<br>
+
+
+```tsx
+// app.ts
+import { TodoComponent } from './components/page/item/todo.js';
+import { NoteComponent } from './components/page/item/note.js';
+import { ImageComponent } from './components/page/item/image.js';
+import { PageComponent } from './components/page/page.js';
+
+class App {
+    private readonly page: PageComponent;
+    constructor(appRoot: HTMLElement) {
+        this.page = new PageComponent();
+        this.page.attachTo(appRoot);
+
+        const image = new ImageComponent('Image Title', 'https://picsum.photos/600/300');
+        image.attachTo(appRoot, 'beforeend');
+
+        const note = new NoteComponent('Note Title', 'Note Body');
+        note.attachTo(appRoot, 'beforeend');
+
+        const todo = new TodoComponent('Todo Title', 'Todo Item');
+        todo.attachTo(appRoot, 'beforeend');
+    }
+}
+
+// 동적으로 만드는게 아니라 개발시 정확히 정해진 경우 -> 무조건 null 아니고 HTMLElement 타입이라고 Type Assertion로 표시
+new App(document.querySelector('.document')! as HTMLElement)
+```
+
+## Video Component
+
+---
+
+**Video 주소 가져오는 방법**
+
+1. 주소창에 있는 URL
+2. 영상에서 마우스 오른쪽 클릭 → copy video url
+
+‼️ **궁극적인 목적 
+→ 위에서 받아온 video 주소를 이용하여 embedded url로 만들어 코드에 작성해야 한다.**
+
+✔︎ **“정규표현식(Regex)”**를 이용하여 문자열의 다수의 특정한 패턴에서 해당하는 문자열을 가져올 수 있다.
+
+```tsx
+// video.ts
+import { BaseComponent } from './../../component.js';
+export class VideoComponent extends BaseComponent<HTMLElement> {
+    constructor(title: string, url: string) {
+        super(`<section class="video">
+                <div class="video__player"><iframe class="video__iframe"></iframe></div>
+                <h3 class="video__title"></h3>
+            </section>`);
+        
+        const iframe = this.element.querySelector('.video__iframe')! as HTMLIFrameElement;
+        // url에서 video_ID만 추출하는 함수를 만들어보자.
+        iframe.src = this.convertToEmbeddedURL(url);
+        
+
+        const titleElement = this.element.querySelector('.video__title')! as HTMLHeadingElement;
+        titleElement.textContent = title;
+    } 
+    
+
+    private convertToEmbeddedURL(url: string): string {
+        const regExp = /^(?:https?:\/\/)?(?:www\.)?(?:(?:youtube.com\/(?:(?:watch\?v=)|(?:embed\/))([a-zA-Z0-9]{11}))|(?:youtu.be\/([a-zA-Z0-9]{11})))/;
+        const match = url.match(regExp);
+
+        const videoId = match? match[1] || match[2] : undefined;
+        if (videoId) {
+            return `https://www.youtube.com/embed/${videoId}`;
+        }
+        return url;
+    }
+}
+
+// <iframe width="950" height="534" src="https://www.youtube.com/embed/yA4d5ZydVVQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+```
+
+✔︎ `super`을 통해 비디오를 넣어줄 `section` 태그를 전달해준다.
+
+✔︎ url에서 video ID만 따로 추출하는 함수 `convertToEmbeddedURL`을 선언한다.
+→ 이 때, **정규 표현식**을 활용한다.
+→ videoId가 존재할 경우 임베드된 video url을 반환할 수 있도록 한다.
+
+### ⚙️ 정규 표현식이란?
+
+[정규 표현식](https://www.notion.so/a55958d343b44ca0b9c190063661e478) 
+
+[RegExr: Learn, Build, & Test RegEx](https://regexr.com/517nr)
