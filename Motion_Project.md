@@ -520,6 +520,38 @@ export class VideoComponent extends BaseComponent<HTMLElement> {
 → 이 때, **정규 표현식**을 활용한다.
 → videoId가 존재할 경우 임베드된 video url을 반환할 수 있도록 한다.
 
+```jsx
+// app.ts
+import { VideoComponent } from './components/page/item/video.js';
+import { TodoComponent } from './components/page/item/todo.js';
+import { NoteComponent } from './components/page/item/note.js';
+import { ImageComponent } from './components/page/item/image.js';
+import { PageComponent } from './components/page/page.js';
+
+class App {
+    private readonly page: PageComponent;
+    constructor(appRoot: HTMLElement) {
+        this.page = new PageComponent();
+        this.page.attachTo(appRoot);
+
+        const image = new ImageComponent('Image Title', 'https://picsum.photos/600/300');
+        image.attachTo(appRoot, 'beforeend');
+
+        const video = new VideoComponent('Video Title', 'https://www.youtube.com/embed/yA4d5ZydVVQ');
+        video.attachTo(appRoot, 'beforeend');
+
+        const note = new NoteComponent('Note Title', 'Note Body');
+        note.attachTo(appRoot, 'beforeend');
+
+        const todo = new TodoComponent('Todo Title', 'Todo Item');
+        todo.attachTo(appRoot, 'beforeend');
+    }
+}
+
+// 동적으로 만드는게 아니라 개발시 정확히 정해진 경우 -> 무조건 null 아니고 HTMLElement 타입이라고 Type Assertion로 표시
+new App(document.querySelector('.document')! as HTMLElement)
+```
+
 ### ⚙️ 정규 표현식이란?
 
 [정규 표현식](https://www.notion.so/a55958d343b44ca0b9c190063661e478) 
