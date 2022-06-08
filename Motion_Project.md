@@ -539,3 +539,294 @@ new App(document.querySelector('.document')! as HTMLElement)
 [정규 표현식](https://www.notion.so/a55958d343b44ca0b9c190063661e478) 
 
 [RegExr: Learn, Build, & Test RegEx](https://regexr.com/517nr)
+
+<br>
+<br>
+
+## Page Item Container 만들기
+
+### ‼️ 왜 PageItemComponent를 만드는 걸까?
+
+✔︎ PageItemComponent는 BaseComponent를 상속한다. 
+  이는 Note, Image, Video, Todo와 같은 사용자가 작성한 내용을 한 단계 더 감싸는 컴포넌트로 close버튼(&times)이 들어 있다.
+
+✔︎ 만약 이런 상위 컴포넌트 없이 각각의 컴포넌트에 닫힘 버튼을 추가한다면,
+  사용자가 작성한 노트를 프린트하기 위한 프리뷰 모드나, 편집 기능이 없는 읽기 모드 같은 화면에서는 재사용이 불가능하다. 각각의 컴포넌트 안에 boolean과 같은 것을 인자로 전달하여
+  if-else와 같은 복잡한 로직을 통해 이를 표현해야 할 것이다.
+
+✔︎ 따라서, 실제의 보여지는 컨텐츠(note, image, video, todo…)와 그것을 감싸서 꾸며주는(닫힘 버튼이 추가된) PageItemComponent 같은 클래스를 만드는 것이다.
+
+### ‼️ Composable 인터페이스는 왜 필요할까?
+
+✔︎ `PageComponent`는 `PageItemComponent`와 같은 다른 자식 컴포넌트를 자기 자신 안에 추가할 수 있고,
+  `pageItemComponent`는 실제의 노트 컨텐츠 컴포넌트들을 자기 자신안에 추가할 수 있다.
+
+✔︎ 즉, `PageComponent`도 `PageItemComponent`도 다른 자식 컴포넌트를 자기 안에 추가할 수 있는 클래스이므로, 공통된 `addChild` 함수를 따로 `Composable`이라는 인터페이스를
+  생성했다.
+
+✔︎ 이렇게 따로 인터페이스로 정의하는 이유는 바로 커플링 때문이다. 즉, 클래스간에 서로 지나치게 연관되어져 있으면 유지보수성, 확정성이 떨어지게된다.
+
+> **클래스들 간에 서로 지나치게 밀접하게 연관되어져 있으면, 즉 커플링이 심하게 돼있으면, 유지보수성, 확정성이 떨어진다.**
+> 
+
+> 따라서, 클래스에서 주된 규격 사항들을 인터페이스로 정의한 후 클래스에서 그 인터페이스의 규격을 따라 가도록 구현해 놓고, 
+사용하는 곳에서 클래스 이름의 타입이 아니라,
+**인터페이스 이름의 타입**으로 지정해 두면 **다음에 다른 구현 사항이 생기면 쉽게 다른 클래스로 변환이 가능하다.**
+> 
+
+```tsx
+// page.ts
+import { BaseComponent, Component } from './../component.js';
+
+export interface Composable {
+    addChild(child: Component): void;
+}
+
+class PageItemComponent extends BaseComponent<HTMLElement> implements Composable {
+    constructor() {
+        super(`<li class="page-item">
+                <section class="page-item__body"></section>
+                <div class="page-item__controls">
+                    <button class="close">&times;</button>
+                </div>
+            </li>`);
+    }
+    addChild(child: Component) {
+        const container = this.element.querySelector('.page-item__body')! as HTMLElement;
+        child.attachTo(container);
+    } 
+}
+
+export class PageComponent extends BaseComponent<HTMLUListElement> implements Composable {
+    constructor() {
+        super('<ul class="page"></ul>');
+    }
+
+    addChild(section: Component) {
+        const item = new PageItemComponent();
+        item.addChild(section);
+        item.attachTo(this.element, 'beforeend');
+    }
+}
+```
+
+```tsx
+// app.ts
+import { Component } from './components/component';
+import { VideoComponent } from './components/page/item/video.js';
+import { TodoComponent } from './components/page/item/todo.js';
+import { NoteComponent } from './components/page/item/note.js';
+import { ImageComponent } from './components/page/item/image.js';
+import { PageComponent, Composable } from './components/page/page.js';
+
+class App {
+    // Component이면서 addChild를 할 수 있는 Composable이 가능한 요소
+    private readonly page: Component & Composable;
+    constructor(appRoot: HTMLElement) {
+        this.page = new PageComponent();
+        this.page.attachTo(appRoot);
+
+        const image = new ImageComponent('Image Title', 'https://picsum.photos/600/300');
+        this.page.addChild(image);
+
+        const video = new VideoComponent('Video Title', 'https://www.youtube.com/embed/yA4d5ZydVVQ');
+        this.page.addChild(video);
+
+        const note = new NoteComponent('Note Title', 'Note Body');
+        this.page.addChild(note);
+
+        const todo = new TodoComponent('Todo Title', 'Todo Item');
+        this.page.addChild(todo);
+    }
+}
+
+// 동적으로 만드는게 아니라 개발시 정확히 정해진 경우 -> 무조건 null 아니고 HTMLElement 타입이라고 Type Assertion로 표시
+new App(document.querySelector('.document')! as HTMLElement)
+```
+
+## 아이템 삭제 기능 구현
+
+```tsx
+// page.ts
+import { BaseComponent, Component } from './../component.js';
+
+export interface Composable {
+    addChild(child: Component): void;
+}
+
+type OnCloseListener = () => void;
+
+class PageItemComponent extends BaseComponent<HTMLElement> implements Composable {
+    private closeListener?: OnCloseListener;
+    constructor() {
+        super(`<li class="page-item">
+                <section class="page-item__body"></section>
+                <div class="page-item__controls">
+                    <button class="close">&times;</button>
+                </div>
+            </li>`);
+        const closeBtn = this.element.querySelector('.close')! as HTMLButtonElement;
+        closeBtn.onclick = () => {
+            this.closeListener && this.closeListener();
+        };
+    }
+    addChild(child: Component) {
+        const container = this.element.querySelector('.page-item__body')! as HTMLElement;
+        child.attachTo(container);
+    } 
+    setOnCloseListener(listener: OnCloseListener) {
+        this.closeListener = listener;
+    }
+}
+
+export class PageComponent extends BaseComponent<HTMLUListElement> implements Composable {
+    constructor() {
+        super('<ul class="page"></ul>');
+    }
+
+    addChild(section: Component) {
+        const item = new PageItemComponent();
+        item.addChild(section);
+        item.attachTo(this.element, 'beforeend');
+        item.setOnCloseListener(() => {
+            item.removeFrom(this.element);
+        })
+    }
+}
+```
+
+```tsx
+// component.ts
+export interface Component {
+    attachTo(parent: HTMLElement, position?: InsertPosition): void;
+    removeFrom(parent: HTMLElement): void;
+}
+
+// Encapsulate the HTML element creation 
+export class BaseComponent<T extends HTMLElement> implements Component {
+    // 한 번 만들어진 요소는 변경 불가 (요소 안의 상태들은 변경 가능)
+    protected readonly element: T;
+    constructor(htmlString: string) {
+        const template = document.createElement('template');
+        template.innerHTML = htmlString;
+        this.element = template.content.firstElementChild! as T;
+    }
+
+    attachTo(parent: HTMLElement, position: InsertPosition = 'afterbegin') {
+        parent.insertAdjacentElement(position, this.element);
+    }
+
+    removeFrom(parent: HTMLElement) {
+        if(parent !== this.element.parentElement) {
+            throw new Error('Parent mismatch‼️');
+        }
+        parent.removeChild(this.element);
+    }
+}
+```
+
+## 🏭 Dependecny Injection - Refactoring
+
+PageComponent를 재사용하면서 어떻게 우리가 원하는 pageItemComponent를 만들 수 있을지…
+
+‼️ **위 코드의 문제가 무엇일까?**
+
+✔︎ 바로, `PageComponent` 안에서 자체적으로 `PageItemComponent`를 만들고 있었다. →  `const item = new PageItemComponent();` 
+  DI도 없고 클래스간 커플링이 심하다.
+
+✔︎ 그래서 이를 해결하기 위해 `PageItemComponent`를 대표하는 해당 규격사항을 정의하는 `SectionContainer`라는 인터페이스를 만들었다.
+
+✔︎ 이에 따라, `PageComponent` 안에서 `PageItemComponent`를 바로 쓰는 것이 아니라, `SectionContainer`라는 인터페이스 타입으로 썼다.
+
+✔︎ 따라서, `PageComponent`는 `SectionContainer`라는 인터페이스의 규격을 따라가는 그 어떤 클래스라도 추가할 수 있는 유연한 클래스가 됐다.
+
+```tsx
+// page.ts
+import { BaseComponent, Component } from './../component.js';
+
+export interface Composable {
+    addChild(child: Component): void;
+}
+
+type OnCloseListener = () => void;
+
+interface SectionContainer extends Component, Composable {
+    setOnCloseListener(listener: OnCloseListener): void;
+}
+
+type SectionContainerConstructor = {
+    new (): SectionContainer;     
+}
+
+export class PageItemComponent extends BaseComponent<HTMLElement> implements SectionContainer {
+    private closeListener?: OnCloseListener;
+    constructor() {
+        super(`<li class="page-item">
+                <section class="page-item__body"></section>
+                <div class="page-item__controls">
+                    <button class="close">&times;</button>
+                </div>
+            </li>`);
+        const closeBtn = this.element.querySelector('.close')! as HTMLButtonElement;
+        closeBtn.onclick = () => {
+            this.closeListener && this.closeListener();
+        };
+    }
+    addChild(child: Component) {
+        const container = this.element.querySelector('.page-item__body')! as HTMLElement;
+        child.attachTo(container);
+    } 
+    setOnCloseListener(listener: OnCloseListener) {
+        this.closeListener = listener;
+    }
+}
+
+export class PageComponent extends BaseComponent<HTMLUListElement> implements Composable {
+    constructor(private pageItemConstructor: SectionContainerConstructor) {
+        super('<ul class="page"></ul>');
+    }
+
+    addChild(section: Component) {
+        const item = new this.pageItemConstructor();
+        item.addChild(section);
+        item.attachTo(this.element, 'beforeend');
+        item.setOnCloseListener(() => {
+            item.removeFrom(this.element);
+        })
+    }
+}
+```
+
+```tsx
+// app.ts
+import { Component } from './components/component.js';
+import { VideoComponent } from './components/page/item/video.js';
+import { TodoComponent } from './components/page/item/todo.js';
+import { NoteComponent } from './components/page/item/note.js';
+import { ImageComponent } from './components/page/item/image.js';
+import { PageComponent, Composable, PageItemComponent } from './components/page/page.js';
+
+class App {
+    // Component이면서 addChild를 할 수 있는 Composable이 가능한 요소
+    private readonly page: Component & Composable;
+    constructor(appRoot: HTMLElement) {
+        this.page = new PageComponent(PageItemComponent);
+        this.page.attachTo(appRoot);
+
+        const image = new ImageComponent('Image Title', 'https://picsum.photos/600/300');
+        this.page.addChild(image);
+
+        const video = new VideoComponent('Video Title', 'https://www.youtube.com/embed/yA4d5ZydVVQ');
+        this.page.addChild(video);
+
+        const note = new NoteComponent('Note Title', 'Note Body');
+        this.page.addChild(note);
+
+        const todo = new TodoComponent('Todo Title', 'Todo Item');
+        this.page.addChild(todo);
+    }
+}
+
+// 동적으로 만드는게 아니라 개발시 정확히 정해진 경우 -> 무조건 null 아니고 HTMLElement 타입이라고 Type Assertion로 표시
+new App(document.querySelector('.document')! as HTMLElement)
+```
